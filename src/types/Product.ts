@@ -12,3 +12,7 @@ export interface Selection {
   bottle?: Product;  
   powerbank?: Product;
 }
+
+export interface VoteData {
+  [productId: string]: number;
+}

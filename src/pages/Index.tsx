@@ -1,69 +1,93 @@
 
 import { useState } from 'react';
-import { Product, Selection } from '@/types/Product';
 import StartScreen from '@/components/StartScreen';
 import SwipeScreen from '@/components/SwipeScreen';
 import ResultScreen from '@/components/ResultScreen';
+import { Product, VoteData } from '@/types/Product';
+import { categoryOrder, getProductsByCategory } from '@/data/products';
 
-type Screen = 'start' | 'swipe' | 'result';
+type GameState = 'start' | 'voting' | 'result';
 
 const Index = () => {
-  const [currentScreen, setCurrentScreen] = useState<Screen>('start');
-  const [currentStep, setCurrentStep] = useState(1);
-  const [selection, setSelection] = useState<Selection>({});
+  const [gameState, setGameState] = useState<GameState>('start');
+  const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
+  const [currentProductIndex, setCurrentProductIndex] = useState(0);
+  const [votes, setVotes] = useState<VoteData>({});
 
   const handleStart = () => {
-    setCurrentScreen('swipe');
-    setCurrentStep(1);
-    setSelection({});
+    setGameState('voting');
+    setCurrentCategoryIndex(0);
+    setCurrentProductIndex(0);
+    setVotes({});
   };
 
-  const handleProductSelected = (product: Product) => {
-    const newSelection = { ...selection };
+  const handleVote = (product: Product, voteType: 'yes' | 'no') => {
+    console.log(`Vote for ${product.name}: ${voteType}`);
     
-    if (product.category === 'backpack') {
-      newSelection.backpack = product;
-    } else if (product.category === 'bottle') {
-      newSelection.bottle = product;
-    } else if (product.category === 'powerbank') {
-      newSelection.powerbank = product;
+    // Nur "Ja"-Stimmen werden gezählt
+    if (voteType === 'yes') {
+      setVotes(prevVotes => ({
+        ...prevVotes,
+        [product.id]: (prevVotes[product.id] || 0) + 1,
+      }));
     }
-    
-    setSelection(newSelection);
 
-    if (currentStep < 3) {
-      setCurrentStep(prev => prev + 1);
+    // Zur nächsten Bewertung
+    const currentCategory = categoryOrder[currentCategoryIndex];
+    const categoryProducts = getProductsByCategory(currentCategory);
+
+    if (currentProductIndex < categoryProducts.length - 1) {
+      // Nächstes Produkt in der gleichen Kategorie
+      setCurrentProductIndex(prev => prev + 1);
     } else {
-      setCurrentScreen('result');
+      // Letzte Produkt der Kategorie -> zur nächsten Kategorie
+      if (currentCategoryIndex < categoryOrder.length - 1) {
+        setCurrentCategoryIndex(prev => prev + 1);
+        setCurrentProductIndex(0);
+      } else {
+        // Alle Kategorien durchlaufen -> Ergebnis anzeigen
+        console.log('Final votes:', votes);
+        setGameState('result');
+      }
     }
   };
 
   const handleRestart = () => {
-    setCurrentScreen('start');
-    setCurrentStep(1);
-    setSelection({});
+    setGameState('start');
+    setCurrentCategoryIndex(0);
+    setCurrentProductIndex(0);
+    setVotes({});
+  };
+
+  const renderContent = () => {
+    switch (gameState) {
+      case 'start':
+        return <StartScreen onStart={handleStart} />;
+      case 'voting':
+        const currentCategory = categoryOrder[currentCategoryIndex];
+        const categoryProducts = getProductsByCategory(currentCategory);
+        const currentProduct = categoryProducts[currentProductIndex];
+        
+        return (
+          <SwipeScreen
+            product={currentProduct}
+            onVote={handleVote}
+            currentStep={currentCategoryIndex + 1}
+            totalSteps={categoryOrder.length}
+            currentProductIndex={currentProductIndex}
+            totalProductsInCategory={categoryProducts.length}
+          />
+        );
+      case 'result':
+        return <ResultScreen votes={votes} onRestart={handleRestart} />;
+      default:
+        return <StartScreen onStart={handleStart} />;
+    }
   };
 
   return (
-    <div className="font-inter">
-      {currentScreen === 'start' && (
-        <StartScreen onStart={handleStart} />
-      )}
-      
-      {currentScreen === 'swipe' && (
-        <SwipeScreen 
-          step={currentStep}
-          selection={selection}
-          onProductSelected={handleProductSelected}
-        />
-      )}
-      
-      {currentScreen === 'result' && (
-        <ResultScreen 
-          selection={selection}
-          onRestart={handleRestart}
-        />
-      )}
+    <div className="min-h-screen">
+      {renderContent()}
     </div>
   );
 };

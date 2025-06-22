@@ -75,3 +75,11 @@ export const products: Product[] = [
 export const getProductsByCategory = (category: Product['category']): Product[] => {
   return products.filter(product => product.category === category);
 };
+
+export const categoryOrder: Product['category'][] = ['backpack', 'powerbank', 'bottle'];
+
+export const categoryTitles: Record<Product['category'], string> = {
+  'backpack': 'Bewerte alle Rucksäcke',
+  'powerbank': 'Bewerte alle Powerbanks', 
+  'bottle': 'Bewerte alle Trinkflaschen'
+};
