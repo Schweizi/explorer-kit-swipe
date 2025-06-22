@@ -32,23 +32,23 @@ const SwipeScreen = ({
   };
 
   return (
-    <div className="min-h-screen bg-transa-dark flex flex-col p-6">
+    <div className="min-h-screen bg-[#f6fddd] flex flex-col p-6">
       {/* Header */}
       <div className="text-center mb-8">
-        <div className="text-transa-cream/60 font-inter text-sm mb-2">
+        <div className="text-[#1a1a1a]/60 font-inter text-sm mb-2">
           Schritt {currentStep}/3
         </div>
-        <h2 className="text-2xl font-inter font-semibold text-transa-cream mb-2">
+        <h2 className="text-2xl font-inter font-semibold text-[#1a1a1a] mb-2">
           {categoryTitles[product.category]}
         </h2>
-        <div className="text-transa-cream/60 font-inter text-sm mb-6">
+        <div className="text-[#1a1a1a]/60 font-inter text-sm mb-6">
           Produkt {currentProductIndex + 1} von {totalProductsInCategory}
         </div>
         
         {/* Progress bar */}
-        <div className="w-full max-w-xs mx-auto bg-transa-dark border border-transa-cream/20 rounded-full h-2">
+        <div className="w-full max-w-xs mx-auto bg-white border border-[#1a1a1a]/20 rounded-full h-2">
           <div 
-            className="bg-transa-yellow h-full rounded-full transition-all duration-300"
+            className="bg-[#f0d600] h-full rounded-full transition-all duration-300"
             style={{ width: `${(currentStep / totalSteps) * 100}%` }}
           />
         </div>
@@ -69,7 +69,7 @@ const SwipeScreen = ({
       </div>
 
       {/* Instructions */}
-      <div className="text-center text-transa-cream/60 font-inter text-sm">
+      <div className="text-center text-[#1a1a1a]/60 font-inter text-sm">
         Wische oder tippe die Buttons für deine Bewertung
       </div>
     </div>

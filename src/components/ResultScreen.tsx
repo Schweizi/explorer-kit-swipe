@@ -13,11 +13,10 @@ interface ResultScreenProps {
 const ResultScreen = ({ votes, onRestart }: ResultScreenProps) => {
   const [showContactForm, setShowContactForm] = useState(false);
   
-  // Ermittele die Gewinner-Produkte für jede Kategorie
   const getWinningProducts = (): Product[] => {
     return categoryOrder.map(category => {
       const categoryProducts = getProductsByCategory(category);
-      let winner = categoryProducts[0]; // Standard-Gewinner falls keine Votes
+      let winner = categoryProducts[0];
       let maxVotes = 0;
 
       categoryProducts.forEach(product => {
@@ -41,14 +40,14 @@ const ResultScreen = ({ votes, onRestart }: ResultScreenProps) => {
 
   if (showContactForm) {
     return (
-      <div className="min-h-screen bg-transa-dark flex flex-col items-center justify-center p-6">
+      <div className="min-h-screen bg-[#f6fddd] flex flex-col items-center justify-center p-6">
         <div className="max-w-md mx-auto">
           <ContactForm selectedProducts={selectedProductsForForm} />
           
           <Button 
             onClick={() => setShowContactForm(false)}
             variant="outline"
-            className="w-full border-transa-cream text-transa-cream hover:bg-transa-cream hover:text-transa-dark font-inter font-medium py-4 rounded-2xl transition-all duration-200 mt-4"
+            className="w-full border-[#1a1a1a] text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-[#f6fddd] font-inter font-medium py-4 rounded-2xl transition-all duration-200 mt-4"
           >
             Zurück zur Übersicht
           </Button>
@@ -58,16 +57,16 @@ const ResultScreen = ({ votes, onRestart }: ResultScreenProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-transa-dark flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-[#f6fddd] flex flex-col items-center justify-center p-6">
       <div className="max-w-md mx-auto text-center">
         <div className="mb-8 animate-card-enter">
-          <h1 className="text-3xl font-inter font-bold text-transa-cream mb-4">
-            Das Community
+          <h1 className="text-3xl font-inter font-bold text-[#1a1a1a] mb-4">
+            Das offizielle
           </h1>
-          <h2 className="text-4xl font-inter font-bold text-transa-yellow mb-6">
-            Essential Explorer Kit
+          <h2 className="text-4xl font-inter font-bold text-[#00a4b7] mb-6">
+            Community Explorer Kit!
           </h2>
-          <p className="text-transa-cream/80 font-inter text-sm mb-4">
+          <p className="text-[#1a1a1a]/80 font-inter text-sm mb-4">
             Basierend auf allen Community-Stimmen - die beliebtesten Produkte jeder Kategorie
           </p>
         </div>
@@ -75,7 +74,7 @@ const ResultScreen = ({ votes, onRestart }: ResultScreenProps) => {
         {/* Winning products */}
         <div className="space-y-6 mb-8">
           {winningProducts.map((product, index) => (
-            <div key={product.id} className="bg-transa-cream rounded-2xl p-4 shadow-lg animate-card-enter" style={{ animationDelay: `${index * 0.1}s` }}>
+            <div key={product.id} className="bg-white rounded-2xl p-4 shadow-lg animate-card-enter" style={{ animationDelay: `${index * 0.1}s` }}>
               <div className="flex items-center space-x-4">
                 <img 
                   src={product.image} 
@@ -83,13 +82,13 @@ const ResultScreen = ({ votes, onRestart }: ResultScreenProps) => {
                   className="w-16 h-16 object-cover rounded-xl"
                 />
                 <div className="flex-1 text-left">
-                  <h3 className="font-inter font-semibold text-transa-dark">
+                  <h3 className="font-inter font-semibold text-[#1a1a1a]">
                     {product.name}
                   </h3>
-                  <p className="text-sm text-transa-dark/70 font-inter">
+                  <p className="text-sm text-[#1a1a1a]/70 font-inter">
                     {product.description}
                   </p>
-                  <p className="text-xs text-transa-turquoise font-inter font-medium">
+                  <p className="text-xs text-[#00a4b7] font-inter font-medium">
                     {votes[product.id] || 0} Community-Stimmen
                   </p>
                 </div>
@@ -102,7 +101,7 @@ const ResultScreen = ({ votes, onRestart }: ResultScreenProps) => {
         <div className="space-y-4">
           <Button 
             onClick={() => setShowContactForm(true)}
-            className="w-full bg-transa-turquoise hover:bg-transa-turquoise/90 text-white font-inter font-semibold py-6 text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+            className="w-full bg-[#00a4b7] hover:bg-[#00a4b7]/90 text-white font-inter font-semibold py-6 text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
           >
             Interesse bekunden
           </Button>
@@ -110,13 +109,13 @@ const ResultScreen = ({ votes, onRestart }: ResultScreenProps) => {
           <Button 
             onClick={onRestart}
             variant="outline"
-            className="w-full border-transa-cream text-transa-cream hover:bg-transa-cream hover:text-transa-dark font-inter font-medium py-4 rounded-2xl transition-all duration-200"
+            className="w-full border-[#1a1a1a] text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-[#f6fddd] font-inter font-medium py-4 rounded-2xl transition-all duration-200"
           >
-            Nochmal abstimmen
+            Erneut abstimmen
           </Button>
         </div>
 
-        <div className="mt-8 text-transa-cream/60 font-inter text-sm">
+        <div className="mt-8 text-[#1a1a1a]/60 font-inter text-sm">
           Das perfekte Bundle - gewählt von der Community!
         </div>
       </div>
