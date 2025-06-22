@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,18 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Transa custom colors
+				transa: {
+					dark: '#1a1a1a',
+					cream: '#f6fddd', 
+					turquoise: '#00a4b7',
+					red: '#d21827',
+					yellow: '#f0d600'
 				}
+			},
+			fontFamily: {
+				'inter': ['Inter', 'sans-serif'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,11 +96,26 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'swipe-out-left': {
+					'0%': { transform: 'translateX(0) rotate(0deg)', opacity: '1' },
+					'100%': { transform: 'translateX(-100vw) rotate(-30deg)', opacity: '0' }
+				},
+				'swipe-out-right': {
+					'0%': { transform: 'translateX(0) rotate(0deg)', opacity: '1' },
+					'100%': { transform: 'translateX(100vw) rotate(30deg)', opacity: '0' }
+				},
+				'card-enter': {
+					'0%': { transform: 'scale(0.8) translateY(50px)', opacity: '0' },
+					'100%': { transform: 'scale(1) translateY(0)', opacity: '1' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'swipe-out-left': 'swipe-out-left 0.5s ease-in-out forwards',
+				'swipe-out-right': 'swipe-out-right 0.5s ease-in-out forwards',
+				'card-enter': 'card-enter 0.4s ease-out'
 			}
 		}
 	},
