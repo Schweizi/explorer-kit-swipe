@@ -22,7 +22,6 @@ const SwipeScreen = ({ step, selection, onProductSelected }: SwipeScreenProps) =
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
   const [startX, setStartX] = useState(0);
-  const cardContainerRef = useRef<HTMLDivElement>(null);
 
   const currentProduct = products[currentProductIndex];
 
@@ -30,7 +29,7 @@ const SwipeScreen = ({ step, selection, onProductSelected }: SwipeScreenProps) =
     if (currentProductIndex < products.length - 1) {
       setCurrentProductIndex(prev => prev + 1);
     } else {
-      setCurrentProductIndex(0); // Loop back to first product
+      setCurrentProductIndex(0);
     }
   };
 
@@ -38,15 +37,15 @@ const SwipeScreen = ({ step, selection, onProductSelected }: SwipeScreenProps) =
     onProductSelected(currentProduct);
   };
 
-  // Mouse/Touch event handlers
+  // Drag handlers
   const handleStart = (clientX: number) => {
     setIsDragging(true);
     setStartX(clientX);
+    setDragOffset(0);
   };
 
   const handleMove = (clientX: number) => {
     if (!isDragging) return;
-    
     const offset = clientX - startX;
     setDragOffset(offset);
   };
@@ -74,28 +73,18 @@ const SwipeScreen = ({ step, selection, onProductSelected }: SwipeScreenProps) =
     handleStart(e.clientX);
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    handleMove(e.clientX);
-  };
-
-  const handleMouseUp = () => {
-    handleEnd();
-  };
-
   // Touch events
   const handleTouchStart = (e: React.TouchEvent) => {
+    e.preventDefault();
     handleStart(e.touches[0].clientX);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    e.preventDefault();
     handleMove(e.touches[0].clientX);
   };
 
-  const handleTouchEnd = () => {
-    handleEnd();
-  };
-
-  // Global mouse move and up events
+  // Global event handlers
   useEffect(() => {
     const handleGlobalMouseMove = (e: MouseEvent) => {
       if (isDragging) {
@@ -109,14 +98,31 @@ const SwipeScreen = ({ step, selection, onProductSelected }: SwipeScreenProps) =
       }
     };
 
+    const handleGlobalTouchMove = (e: TouchEvent) => {
+      if (isDragging) {
+        e.preventDefault();
+        handleMove(e.touches[0].clientX);
+      }
+    };
+
+    const handleGlobalTouchEnd = () => {
+      if (isDragging) {
+        handleEnd();
+      }
+    };
+
     if (isDragging) {
       document.addEventListener('mousemove', handleGlobalMouseMove);
       document.addEventListener('mouseup', handleGlobalMouseUp);
+      document.addEventListener('touchmove', handleGlobalTouchMove, { passive: false });
+      document.addEventListener('touchend', handleGlobalTouchEnd);
     }
 
     return () => {
       document.removeEventListener('mousemove', handleGlobalMouseMove);
       document.removeEventListener('mouseup', handleGlobalMouseUp);
+      document.removeEventListener('touchmove', handleGlobalTouchMove);
+      document.removeEventListener('touchend', handleGlobalTouchEnd);
     };
   }, [isDragging, startX]);
 
@@ -143,14 +149,9 @@ const SwipeScreen = ({ step, selection, onProductSelected }: SwipeScreenProps) =
       {/* Product card */}
       <div className="flex-1 flex items-center justify-center">
         <div 
-          ref={cardContainerRef}
-          className="select-none cursor-grab active:cursor-grabbing"
+          className="select-none cursor-grab active:cursor-grabbing touch-none"
           onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
           onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
         >
           <ProductCard
             key={currentProduct.id}
