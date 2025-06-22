@@ -22,10 +22,12 @@ const SwipeScreen = ({ step, selection, onProductSelected }: SwipeScreenProps) =
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
   const [startX, setStartX] = useState(0);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const currentProduct = products[currentProductIndex];
 
   const handleSwipeLeft = () => {
+    console.log('Swipe Left - Next product');
     if (currentProductIndex < products.length - 1) {
       setCurrentProductIndex(prev => prev + 1);
     } else {
@@ -34,11 +36,13 @@ const SwipeScreen = ({ step, selection, onProductSelected }: SwipeScreenProps) =
   };
 
   const handleSwipeRight = () => {
+    console.log('Swipe Right - Product selected:', currentProduct.name);
     onProductSelected(currentProduct);
   };
 
   // Drag handlers
   const handleStart = (clientX: number) => {
+    console.log('Drag started at:', clientX);
     setIsDragging(true);
     setStartX(clientX);
     setDragOffset(0);
@@ -53,9 +57,10 @@ const SwipeScreen = ({ step, selection, onProductSelected }: SwipeScreenProps) =
   const handleEnd = () => {
     if (!isDragging) return;
     
+    console.log('Drag ended with offset:', dragOffset);
     setIsDragging(false);
     
-    const threshold = 100;
+    const threshold = 80; // Reduzierter Threshold für bessere Responsivität
     if (Math.abs(dragOffset) > threshold) {
       if (dragOffset > 0) {
         handleSwipeRight();
@@ -70,52 +75,82 @@ const SwipeScreen = ({ step, selection, onProductSelected }: SwipeScreenProps) =
   // Mouse events
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     handleStart(e.clientX);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging) {
+      e.preventDefault();
+      handleMove(e.clientX);
+    }
+  };
+
+  const handleMouseUp = (e: React.MouseEvent) => {
+    if (isDragging) {
+      e.preventDefault();
+      handleEnd();
+    }
   };
 
   // Touch events
   const handleTouchStart = (e: React.TouchEvent) => {
     e.preventDefault();
-    handleStart(e.touches[0].clientX);
+    e.stopPropagation();
+    if (e.touches.length === 1) {
+      handleStart(e.touches[0].clientX);
+    }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    e.preventDefault();
-    handleMove(e.touches[0].clientX);
+    if (isDragging && e.touches.length === 1) {
+      e.preventDefault();
+      handleMove(e.touches[0].clientX);
+    }
   };
 
-  // Global event handlers
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (isDragging) {
+      e.preventDefault();
+      handleEnd();
+    }
+  };
+
+  // Global event handlers für bessere Gesten-Erkennung
   useEffect(() => {
     const handleGlobalMouseMove = (e: MouseEvent) => {
       if (isDragging) {
+        e.preventDefault();
         handleMove(e.clientX);
       }
     };
 
-    const handleGlobalMouseUp = () => {
+    const handleGlobalMouseUp = (e: MouseEvent) => {
       if (isDragging) {
+        e.preventDefault();
         handleEnd();
       }
     };
 
     const handleGlobalTouchMove = (e: TouchEvent) => {
-      if (isDragging) {
+      if (isDragging && e.touches.length === 1) {
         e.preventDefault();
         handleMove(e.touches[0].clientX);
       }
     };
 
-    const handleGlobalTouchEnd = () => {
+    const handleGlobalTouchEnd = (e: TouchEvent) => {
       if (isDragging) {
+        e.preventDefault();
         handleEnd();
       }
     };
 
     if (isDragging) {
-      document.addEventListener('mousemove', handleGlobalMouseMove);
-      document.addEventListener('mouseup', handleGlobalMouseUp);
+      document.addEventListener('mousemove', handleGlobalMouseMove, { passive: false });
+      document.addEventListener('mouseup', handleGlobalMouseUp, { passive: false });
       document.addEventListener('touchmove', handleGlobalTouchMove, { passive: false });
-      document.addEventListener('touchend', handleGlobalTouchEnd);
+      document.addEventListener('touchend', handleGlobalTouchEnd, { passive: false });
     }
 
     return () => {
@@ -124,7 +159,7 @@ const SwipeScreen = ({ step, selection, onProductSelected }: SwipeScreenProps) =
       document.removeEventListener('touchmove', handleGlobalTouchMove);
       document.removeEventListener('touchend', handleGlobalTouchEnd);
     };
-  }, [isDragging, startX]);
+  }, [isDragging, startX, dragOffset]);
 
   return (
     <div className="min-h-screen bg-transa-dark flex flex-col p-6">
@@ -149,9 +184,20 @@ const SwipeScreen = ({ step, selection, onProductSelected }: SwipeScreenProps) =
       {/* Product card */}
       <div className="flex-1 flex items-center justify-center">
         <div 
-          className="select-none cursor-grab active:cursor-grabbing touch-none"
+          ref={cardRef}
+          className="select-none cursor-grab active:cursor-grabbing touch-none w-full max-w-sm"
+          style={{ 
+            touchAction: 'none',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            WebkitTouchCallout: 'none'
+          }}
           onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
           onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         >
           <ProductCard
             key={currentProduct.id}
@@ -168,6 +214,15 @@ const SwipeScreen = ({ step, selection, onProductSelected }: SwipeScreenProps) =
       <div className="text-center text-transa-cream/60 font-inter text-sm">
         {currentProductIndex + 1} von {products.length}
       </div>
+
+      {/* Debug Info (nur in Development) */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed bottom-4 left-4 bg-black/80 text-white p-2 rounded text-xs">
+          <div>Dragging: {isDragging ? 'Yes' : 'No'}</div>
+          <div>Offset: {dragOffset}</div>
+          <div>Product: {currentProductIndex + 1}/{products.length}</div>
+        </div>
+      )}
     </div>
   );
 };
