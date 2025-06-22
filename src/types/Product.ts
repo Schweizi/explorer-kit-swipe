@@ -4,7 +4,7 @@ export interface Product {
   name: string;
   description: string;
   image: string;
-  category: 'backpack' | 'bottle' | 'powerbank';
+  category: 'Rucksäcke' | 'Trinkflaschen' | 'Powerbanks';
 }
 
 export interface Selection {
